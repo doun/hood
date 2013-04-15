@@ -683,6 +683,7 @@ func (hood *Hood) Find(out interface{}) error {
 func (hood *Hood) FindOne(out interface{})error{
     if hood.selectTable == ""{
         hood.Select(out)
+        hood.Limit(1)
     }
     query, args := hood.Dialect.QuerySql(hood)
     return hood.FindOneSql(out,query,args...)
@@ -696,8 +697,9 @@ func (hood *Hood) FindOneSql(out interface{}, query string, args ...interface{})
 	if x := reflect.TypeOf(out).Kind(); x != reflect.Ptr {
 		panic(panicMsg)
 	}
-	outValue := reflect.Indirect(reflect.ValueOf(out))
-	if x := outValue.Kind(); x != reflect.Struct {
+    outValue := reflect.ValueOf(out).Elem()
+	outRef := reflect.Indirect(outValue)
+	if x := outRef.Kind(); x != reflect.Struct {
 		panic(panicMsg)
 	}
 	hood.logSql(query, args...)
@@ -739,7 +741,7 @@ func (hood *Hood) FindOneSql(out interface{}, query string, args ...interface{})
 				}
 			}
 		}
-        outValue.Set(rowValue)
+        outValue.Set(reflect.Indirect(rowValue))
         break;
 	}
 	return nil
