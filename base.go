@@ -47,12 +47,14 @@ func (d *base) SetModelValue(driverValue, fieldValue reflect.Value) error {
 	case reflect.Float32, reflect.Float64:
 		fieldValue.SetFloat(driverValue.Elem().Float())
 	case reflect.String:
-        kind := reflect.TypeOf(driverValue.Elem())
-        if _,ok := kind.FieldByName("val"); ok {
-            fieldValue.SetString(driverValue.Elem().String())
-        }else {
-            fieldValue.SetString(string(driverValue.Elem().Bytes()))
-        }
+        //shoud be string(...)
+        fieldValue.SetString(string(driverValue.Elem().Bytes()))
+       // kind := reflect.TypeOf(driverValue.Elem())
+       // if _,ok := kind.FieldByName("val"); ok {
+       //     fieldValue.SetString(string(driverValue.Elem().Bytes()))
+       // }else {
+       //     fieldValue.SetString(string(driverValue.Elem().Bytes()))
+       // }
 	case reflect.Slice:
 		if reflect.TypeOf(driverValue.Interface()).Elem().Kind() == reflect.Uint8 {
 			fieldValue.SetBytes(driverValue.Elem().Bytes())
